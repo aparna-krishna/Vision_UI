@@ -19,6 +19,7 @@ from tkinter.filedialog import askdirectory
 
 import webbrowser
 from IPython.display import YouTubeVideo
+from ipywidgets import HBox, Label
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -39,10 +40,13 @@ def dashboard_one():
     as well as checking system info and links to fastai, fastai forum and asvcode github page"""
     import fastai
     import psutil
-    print ('>> Vision_UI Update: 12/23/2019')
+    #print ('>> Vision_UI Update: 12/23/2019')
     style = {'description_width': 'initial'}
 
-    button = widgets.Button(description='System')
+    layout = widgets.Layout(width='auto', height='40px') #set width and height
+
+    button = widgets.Button(description='Check System. (Cuda must return true to continue)',
+                         layout=layout, alight_items='stretch')
     display(button)
 
     out = widgets.Output()
@@ -62,46 +66,51 @@ def dashboard_one():
     button.on_click(on_button_clicked_info)
 
     dashboard_one.norma = widgets.ToggleButtons(
-        options=['Imagenet', 'Custom', 'Cifar', 'Mnist'],
+        options=['Imagenet'],#, 'Custom', 'Cifar', 'Mnist'],
         description='Normalization:',
         disabled=False,
+        value='Imagenet',
         button_style='info', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=['Imagenet stats', 'Create your own', 'Cifar stats', 'Mnist stats'],
         style=style
     )
     dashboard_one.archi = widgets.ToggleButtons(
-        options=['alexnet', 'BasicBlock', 'densenet121', 'densenet161', 'densenet169', 'densenet201', 'resnet18',
-                 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'squeezenet1_0', 'squeezenet1_1', 'vgg16_bn',
-                 'vgg19_bn', 'xresnet18', 'xresnet34', 'xresnet50', 'xresnet101', 'xresnet152'],
+        options=['resnet34'],#['alexnet', 'BasicBlock', 'densenet121', 'densenet161', 'densenet169', 'densenet201', 'resnet18',
+                # 'resnet34', 'resnet50', 'resnet101', 'resnet152', 'squeezenet1_0', 'squeezenet1_1', 'vgg16_bn',
+                # 'vgg19_bn', 'xresnet18', 'xresnet34', 'xresnet50', 'xresnet101', 'xresnet152'],
         description='Architecture:',
         disabled=False,
-        button_style='', # 'success', 'info', 'warning', 'danger' or ''
+        value='resnet34',
+        button_style='info', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=[],
     )
-    layout = widgets.Layout(width='auto', height='40px') #set width and height
+    layout = widgets.Layout(width='60%', height='40px') #set width and height
     dashboard_one.pretrain_check = widgets.Checkbox(
         options=['Yes', "No"],
         description='Pretrained:',
-        disabled=False,
+        disabled=True,#False, # we always want it to be pretrained
         value=True,
         box_style='success',
         button_style='lightgreen', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=['Default: Checked = use pretrained weights, Unchecked = No pretrained weights'],
     )
     dashboard_one.method = widgets.ToggleButtons(
-        options=['cnn_learner', 'unet_learner'],
-        description='Method:',
-        disabled=True,
+        options=['cnn_learner'],#, 'unet_learner'],
+        description='Model Method:',
+        disabled=False,
         value='cnn_learner',
-        button_style='success', # 'success', 'info', 'warning', 'danger' or ''
+        button_style='info', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=['Under construction'],
         style=style
     )
-    dashboard_one.f=widgets.FloatSlider(min=8,max=64,step=8,value=32, continuous_update=False, layout=layout, style=style_green, description="Batch size")
-    dashboard_one.m=widgets.FloatSlider(min=0, max=360, step=16, value=128, continuous_update=False, layout=layout, style=style_green, description='Image size')
+
+    #dashboard_one.f=widgets.FloatSlider(min=8,max=64,step=8,value=64, continuous_update=False, layout=layout, style=style_green, description="BS(default 64)")
+    #dashboard_one.m=widgets.FloatSlider(min=0, max=360, step=16, value=224, continuous_update=False, layout=layout, style=style_green, description='ImSizw(default 224)')
+    dashboard_one.f = HBox([Label('BatchSize (default 64)'), widgets.FloatSlider(min=8,max=64,step=8,value=64, continuous_update=False, layout=layout, style=style_green)])
+    dashboard_one.m = HBox([Label('ImageSize (default 225)'), widgets.FloatSlider(min=0, max=360, step=16, value=224, continuous_update=False, layout=layout, style=style_green)])
 
     display(dashboard_one.norma, dashboard_one.archi, dashboard_one.pretrain_check, dashboard_one.method, dashboard_one.f, dashboard_one.m)
-
+'''
     print ('>> Resources')
     button_two = widgets.Button(description='Fastai Docs')
     button_three = widgets.Button(description='Fastai Forums')
@@ -121,7 +130,7 @@ def dashboard_one():
     def vision_utube(b):
             webbrowser.open('https://github.com/asvcode/Vision_UI')
     button_four.on_click(vision_utube)
-
+'''
 ##################################
 ## Modules for Augmentation Tab ##
 ##################################
@@ -135,9 +144,11 @@ def dashboard_two():
 
     print('>> Augmentations\n')
 
+    ###### setting the VALUES here, so it can be picked up by other functions. NOT displaying on dashboard. no need for these to be changed.
+
     dashboard_two.doflip = widgets.ToggleButtons(
         options=['True', 'False'],
-        value=None,
+        value=True,  
         description='Do Flip:',
         disabled=False,
         button_style='success', # 'success', 'info', 'warning', 'danger' or ''
@@ -145,7 +156,7 @@ def dashboard_two():
     )
     dashboard_two.dovert = widgets.ToggleButtons(
         options=['True', "False"],
-        value=None,
+        value=False,
         description='Do Vert:',
         disabled=False,
         button_style='info', # 'success', 'info', 'warning', 'danger' or ''
@@ -177,7 +188,7 @@ def dashboard_two():
     dashboard_two.contrast = widgets.ToggleButtons(
         options=['True', 'False'],
         description='Contrast:',
-        value='False',
+        value='True',
         disabled=False,
         button_style='info', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=[''],
@@ -185,7 +196,7 @@ def dashboard_two():
     dashboard_two.bright = widgets.ToggleButtons(
         options=['True', 'False'],
         description='Brightness:',
-        value='False',
+        value='True',
         disabled=False,
         button_style='info', # 'success', 'info', 'warning', 'danger' or ''
         tooltips=[''],
@@ -208,7 +219,7 @@ def dashboard_two():
     )
     dashboard_two.pad = widgets.ToggleButtons(
         options=['zeros', 'border', 'reflection'],
-        value='reflection',
+        value='border',
         description='Padding:',
         disabled=False,
         button_style='success', # 'success', 'info', 'warning', 'danger' or ''
@@ -477,13 +488,13 @@ def get_image(image_path):
 
 def path_choice():
     """Choose the data path"""
-    root = Tk()
+    #root = Tk()
     path_choice.path = askdirectory(title='Select Folder')
-    root.destroy()
+    #root.destroy()
     path = Path(path_choice.path)
     print('Folder path:', path)
     path_ls = path.ls()
-    data_in()
+    #data_in() removing this
     return path_choice.path
 
 def image_choice():
@@ -714,13 +725,34 @@ def csv_choices():
 def ds():
     """Choose from various data options, either from a custom dataset on computer or from """
     """easy to install datasets"""
-    button = widgets.Button(description='Location')
-
     style = {'description_width': 'initial'}
+    
+    ds.datas = widgets.Button(description='Select Attribute Data', button_style='info', style=style)
+
+    ds.jpg = widgets.Button(description='Convert webp to jpg', button_style='info', style=style)
+
+    ds.split = widgets.Button(description='Split into train / valid', button_style='info', style=style)
+
+    ds.augment = widgets.Button(description='Augment the data',button_style='info', style=style)
+
+    step1 = HBox([Label('Step 1:'), ds.datas])
+
+    step2 =  HBox([Label('Step 2:'), ds.jpg])
+
+    step3 =  HBox([Label('Step 3:'), ds.split])
+
+    step4 = HBox([Label('Step 4:'), ds.augment])
+
+
+    display(step1,step2,step3,step4)#ds.datas, ds.jpg, ds.split, ds.augment)
+
+    '''
+    style = {'description_width': 'initial'}
+    
     ds.datas = widgets.ToggleButtons(
-        options=['Custom', 'CATS&DOGS', 'IMAGENETTE',
-                 'IMAGENETTE_160', 'IMAGENETTE_320', 'IMAGEWOOF', 'IMAGEWOOF_160', 'IMAGEWOOF_320',
-                 'CIFAR', 'CIFAR_100', 'MNIST', 'MNIST_SAMPLE', 'MNIST_TINY', 'FLOWERS', 'FOOD', 'CARS', 'CALTECH' ],
+        options=['Custom']#, 'CATS&DOGS', 'IMAGENETTE',
+                # 'IMAGENETTE_160', 'IMAGENETTE_320', 'IMAGEWOOF', 'IMAGEWOOF_160', 'IMAGEWOOF_320',
+                # 'CIFAR', 'CIFAR_100', 'MNIST', 'MNIST_SAMPLE', 'MNIST_TINY', 'FLOWERS', 'FOOD', 'CARS', 'CALTECH' ],
         description='Choose',
         value=None,
         disabled=False,
@@ -735,19 +767,67 @@ def ds():
         style=style
     )
     display(ds.datas)
-
-    display(button)
-
-    out_three = widgets.Output()
-    display(out_three)
+    '''
+    #display(button)
+    
+    #out_three = widgets.Output()
+    #display(out_three)
 
     def on_button_clicked_info2(b):
-        with out_three:
-            clear_output()
-            ds_choice()
+        path_choice()
+        #with out_three:
+        #    clear_output()
+        #    ds_choice()
 
-    button.on_click(on_button_clicked_info2)
+    ds.datas.on_click(on_button_clicked_info2)
 
+    def clicked1(b):
+        # execute webp_to_jpg.py with path_choice.path as the path variable...) need help on how to implement running a python script
+        pass
+    ds.jpg.on_click(clicked1)
+
+    def clicked2(b):
+        # execute split.py with path_choice.path as the path variable...)
+        pass
+    ds.split.on_click(clicked2)
+
+    def clicked3(b):
+        # execute data_aug_v2.py with path_choice.path as the path variable...)
+        pass
+    ds.augment.on_click(clicked3)
+
+
+def webp_jpg():
+    """ convert all images in the data PATH to jpg """
+    #path_choice.path
+    button1 = widgets.Button(description='Convert webp to jpg', button_style='info')
+    display(button1)
+    def clicked1(b):
+        # execute webp_to_jpg.py with path_choice.path as the path variable...) need help on how to implement running a python script
+        pass
+    button1.on_click(clicked1)
+
+def split():
+    """ uses data PATH to split in train / valid TODOOOO: if test set needs to be added with a script, call it here. (NEED test set for rest of steps) """
+    #path_choice.path
+    button2 = widgets.Button(description='Split data', button_style='info')
+    display(button2)
+    def clicked2(b):
+        # execute split.py with path_choice.path as the path variable...)
+        pass
+    button2.on_click(clicked2)
+
+def augment():
+    """ uses data PATH to augment """
+    #path_choice.path
+    button3 = widgets.Button(description='Augment Data',button_style='info')
+    display(button3)
+    def clicked3(b):
+        # execute data_aug_v2.py with path_choice.path as the path variable...)
+        pass
+    button3.on_click(clicked3)
+    
+'''
 def ds_choice():
     """Helper for dataset choices"""
     print('Choose how the data is saved')
@@ -801,7 +881,7 @@ def ds_choice():
     elif ds.datas.value == 'CALTECH':
         path_choice.path = untar_data(URLs.CALTECH_101)
         data_in()
-
+'''
 def data_in():
     """Helper to determine if the data is in a folder, csv or dataframe"""
     style = {'description_width': 'initial'}
@@ -809,9 +889,9 @@ def data_in():
     button = widgets.Button(description='Data In')
 
     data_in.datain = widgets.ToggleButtons(
-        options=['from_folder', 'from_csv'],
+        options=['from_folder'],#, 'from_csv'],
         description='Data In:',
-        value=None,
+        value='from_folder',
         disabled=False,
         button_style='success',
         tooltips=['Data in folder', 'Data in csv format'],
@@ -845,13 +925,17 @@ def data_in():
 
 def get_data():
     """Helper to get the data from the folder, df or csv"""
-    if data_in.datain.value == 'from_folder':
-        Data_in.in_folder()
+  
+    #if data_in.datain.value == 'from_folder':
+    Data_in.in_folder()
     #TO DO
     #elif data_in.datain.value == 'from_df':
     #    Data_in.in_df()
+    '''
     elif data_in.datain.value == 'from_csv':
         Data_in.in_csv()
+    '''
+    
 
 class Data_in():
     def in_folder():
@@ -875,6 +959,8 @@ class Data_in():
 
         batch_val = int(dashboard_one.f.value) # batch size
         image_val = int(dashboard_one.m.value) # image size
+
+        ## SET THESE INTERNALLY AND HIDE FROM EXTERNAL DASHBOARD
         flip_val = dashboard_two.doflip.value #to use for print statements only
         vert_val = dashboard_two.dovert.value #to use for print statements only
         max_zoom=dashboard_two.three.value
@@ -928,6 +1014,7 @@ class Data_in():
         tfms = get_transforms(do_flip=flip, flip_vert=vert, max_zoom=max_zoom, p_affine=p_affine,
                 max_lighting=max_light, p_lighting=p_light, max_warp=max_warp, xtra_tfms=xtra_tfms)
 
+        print('Creating databunch...')
         data = ImageDataBunch.from_folder(path,
                                           train=train_choice,
                                           valid=valid_choice,
@@ -936,14 +1023,16 @@ class Data_in():
                                           size=image_val,
                                           valid_pct=pct_metrics.f.value,
                                           padding_mode=dashboard_two.pad.value)
+        print('Successfully created databunch')
 
         if display_ui.tab.selected_index == 3: #Batch
             data.show_batch(rows=4, figsize=(10,10))
 
         #if display_ui.tab.selected_index == 4: #Model
 
+        ##### IMPORTANT TRAINING PART
 
-        if display_ui.tab.selected_index == 6 :#Train
+        if display_ui.tab.selected_index == 3 :#Train
             print('FOLDER')
             button_LR = widgets.Button(description='LR')
             button_T = widgets.Button(description='Train')
@@ -2538,23 +2627,23 @@ def display_ui():
 
     out1a = widgets.Output()
     out1 = widgets.Output()
-    out2 = widgets.Output()
-    out3 = widgets.Output()
-    out4 = widgets.Output()
+    #out2 = widgets.Output()
+    #out3 = widgets.Output()
+    #out4 = widgets.Output()
     out5 = widgets.Output()
     out6 = widgets.Output()
     out7 = widgets.Output()
-    out8 = widgets.Output()
+    #out8 = widgets.Output()
 
-    data1a = pd.DataFrame(np.random.normal(size = 50))
-    data1 = pd.DataFrame(np.random.normal(size = 100))
-    data2 = pd.DataFrame(np.random.normal(size = 150))
-    data3 = pd.DataFrame(np.random.normal(size = 200))
-    data4 = pd.DataFrame(np.random.normal(size = 250))
-    data5 = pd.DataFrame(np.random.normal(size = 300))
-    data6 = pd.DataFrame(np.random.normal(size = 350))
-    data7 = pd.DataFrame(np.random.normal(size= 400))
-    data8 = pd.DataFrame(np.random.normal(size=450))
+    data1a = pd.DataFrame(np.random.normal(size = 85))#50))
+    data1 = pd.DataFrame(np.random.normal(size = 165))#100))
+    #data2 = pd.DataFrame(np.random.normal(size = 150))
+    #data3 = pd.DataFrame(np.random.normal(size = 200))
+    #data4 = pd.DataFrame(np.random.normal(size = 250))
+    data5 = pd.DataFrame(np.random.normal(size = 245))#300))
+    data6 = pd.DataFrame(np.random.normal(size = 325))#350))
+    data7 = pd.DataFrame(np.random.normal(size= 405))#400))
+    #data8 = pd.DataFrame(np.random.normal(size=450))
 
     with out1a: #info
         clear_output()
@@ -2562,14 +2651,21 @@ def display_ui():
 
     with out1: #data
         clear_output()
-        print('>> Choose data source')
+        #print('1. Choose dataset for attribute to train:')
         ds()
+        #print('2. Convert from webp to jpg:')
+        #webp_jpg()
+        #print("3. Split the data (into train, valid, test):")
+        #split()
+        #print('4. Augment the data:')
+        #augment()
 
+    '''
     with out2: #augmentation
         clear_output()
         print('>> Choose Augmentation Image first:')
         dashboard_two()
-
+   
     with out3: #Batch
         clear_output()
         print('>> Press button to view batch')
@@ -2638,6 +2734,7 @@ def display_ui():
                 model_summary()
 
         button_mo.on_click(on_button_clicked)
+    '''
 
     with out5: #Metrics
         print ('>> Click button to choose appropriate metrics')
@@ -2657,6 +2754,7 @@ def display_ui():
         button_m.on_click(on_button_clicked_learn)
 
     with out6: #train
+        print("*** most important, has to run LR and choose LR, choose EPOCHS and train")
         button_tr = widgets.Button(description='Train')
         display(button_tr)
         print ('>> Click to view training parameters and learning rate''\n''\n')
@@ -2669,20 +2767,23 @@ def display_ui():
         button_tr.on_click(on_button_clicked)
 
     with out7: #results
+        print('display validation accuracy, test accuracy and store this information somewhere')
         dash()
-
+   
+    '''
     with out8: #view code
         print('view code')
         view_code()
+    '''
 
-    display_ui.tab = widgets.Tab(children = [out1a, out1, out2, out3, out4, out5, out6, out7, out8])
-    display_ui.tab.set_title(0, 'Arch')
-    display_ui.tab.set_title(1, 'Data')
-    display_ui.tab.set_title(2, 'Augmentation')
-    display_ui.tab.set_title(3, 'Batch')
-    display_ui.tab.set_title(4, 'Model')
-    display_ui.tab.set_title(5, 'Metrics')
-    display_ui.tab.set_title(6, 'Train')
-    display_ui.tab.set_title(7, 'Results')
-    display_ui.tab.set_title(8, 'Code')
+    display_ui.tab = widgets.Tab(children = [out1, out1a, out5, out6, out7])
+    display_ui.tab.set_title(0, 'PreProcess')
+    display_ui.tab.set_title(1, 'Architecture')
+    #display_ui.tab.set_title(2, 'Augmentation')
+    #display_ui.tab.set_title(3, 'Batch')
+    #display_ui.tab.set_title(4, 'Model')
+    display_ui.tab.set_title(2, 'Metrics')
+    display_ui.tab.set_title(3, 'Train')
+    display_ui.tab.set_title(4, 'Results')
+    #display_ui.tab.set_title(8, 'Code')
     display(display_ui.tab)
