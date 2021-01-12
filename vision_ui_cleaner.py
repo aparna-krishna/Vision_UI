@@ -581,9 +581,12 @@ class Data_in():
                         #save model
                         file_model_name = value_mone + '_pretrained_' + value_mtwo + '_batch_' + value_mthree + '_image_' + value_mfour
 
-                        learn.fit_one_cycle(cycle_l,
-                                            slice(lr_work.info),
-                                            callbacks=[SaveModelCallback(learn, every='improvement', monitor=b_, name='best_'+ file_model_name)])
+                        accuracy_out = widgets.Output()
+                        display(accuracy_out)
+                        with accuracy_out:
+                            learn.fit_one_cycle(cycle_l,
+                                                slice(lr_work.info),
+                                                callbacks=[SaveModelCallback(learn, every='improvement', monitor=b_, name='best_'+ file_model_name)])
                         learn.export(file_model_name)
 
                     button.on_click(on_button_clicked_3)
@@ -806,7 +809,7 @@ def training_ds():
 
 def learn_dash():
     button = widgets.Button(description="Learn")
-    print ('Choosen metrics: ',metrics_list(mets_list))
+    print ('Chosen metrics: ',metrics_list(mets_list))
     metrics_list(mets_list)
 
     
@@ -826,8 +829,12 @@ def learn_dash():
 
     learn = cnn_learner(data, base_arch=arch_work.info, pretrained=r, metrics=metrics_list(mets_list,mets_list_code), custom_head=None)
 
-    learn.lr_find()
-    learn.recorder.plot()
+    lr_out = widgets.Output()
+    display(lr_out)
+
+    with lr_out:
+        learn.lr_find()     
+        learn.recorder.plot()
 
 ############################
 
